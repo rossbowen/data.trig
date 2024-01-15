@@ -1,0 +1,391 @@
+# A worked RDF example, aiming to impement the Data on the Web Best Practices: https://www.w3.org/TR/dwbp/
+
+@prefix adms: <http://www.w3.org/ns/adms#> .
+@prefix csvw: <http://www.w3.org/ns/csvw#> .
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix dqv: <http://www.w3.org/ns/dqv#> .
+@prefix duv: <https://www.w3.org/TR/vocab-duv/> .
+@prefix ex: <http://example.org/vocab#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix oa: <http://www.w3.org/ns/oa#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix qb: <http://purl.org/linked-data/cube#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix schema: <http://schema.org/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix spdx: <http://spdx.org/rdf/terms#> .
+@prefix wdrs: <http://www.w3.org/2007/05/powder-s#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+<https://data.gov.uk> { 
+
+# Define a data service
+
+<https://data.gov.uk> a dcat:DataService ;
+    dcat:endpointURL <https://data.gov.uk/sparql> ;
+    dcat:endpointDescription <https://data.gov.uk/faq> ;
+    dcat:servesDataset <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018/datacube> ;
+    .
+
+# Define a data catalog
+
+<https://data.gov.uk/catalog> a dcat:Catalog ;
+    dcterms:title "A data catalog"@en ;
+    dcat:themeTaxonomy <https://data.gov.uk/themes> ;
+    dcat:record
+        <https://data.gov.uk/series/name-of-my-statistical-series/record>,
+        <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018/record> ;
+    .
+
+}
+
+# A concept scheme of themes used to categorise datasets
+
+<https://data.gov.uk/themes> {
+
+<https://data.gov.uk/themes> a skos:ConceptScheme ;
+    skos:prefLabel "A set of domains to classify datasets and publications."@en ;
+    skos:hasTopConcept 
+        <https://data.gov.uk/theme/health>,
+        <https://data.gov.uk/theme/education>,
+        <https://data.gov.uk/theme/environment> ;
+    .
+
+}
+
+# The catalog contains records
+
+<https://data.gov.uk/catalog> {
+
+    <https://data.gov.uk/series/name-of-my-statistical-series/record> a dcat:CatalogRecord ;
+        dcterms:issued "2015-01-01T00:00:00Z"^^xsd:dateTime ;
+        foaf:primaryTopic <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018> ;
+        .
+
+    <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018/record> a dcat:CatalogRecord ;
+        dcterms:issued "2018-01-01T00:00:00Z"^^xsd:dateTime ;
+        foaf:primaryTopic <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018> ;
+        .
+
+}
+
+# If a catalog is represented as an RDF Dataset with named graphs (as defined in
+# [SPARQL11-QUERY]), then it is appropriate to place the description of each
+# dataset (consisting of all RDF triples that mention the dcat:Dataset,
+# dcat:CatalogRecord, and any of its dcat:Distributions) into a separate named
+# graph. The name of that graph SHOULD be the IRI of the catalog record.
+
+<https://data.gov.uk/series/name-of-my-statistical-series/record> {
+
+    # Use dcat:DatasetSeries to link separately published but interrelated datasets
+
+    <https://data.gov.uk/series/name-of-my-statistical-series> a dcat:DatasetSeries ;
+        dcterms:title "Dataset Series"@en ;
+        dcterms:issued "2015-01-01T00:00:00Z"^^xsd:dateTime ;
+        dcterms:modified "2015-03-01T00:00:00Z"^^xsd:dateTime ;
+        .
+
+}
+
+<https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018/record> {
+
+    # Follows DWBP Best Practice 7. Provides a "generic" URI.
+
+    <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018> a dcat:Dataset ;
+        dcterms:identifier "dataset-2018" ;
+        dcterms:title "Dataset, 2018"@en ;
+        dcterms:description "This is the first dataset"@en ;
+        dcterms:license <https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/> ;
+        dcterms:publisher <https://www.ons.gov.uk/> ;
+        dcterms:issued "2018-01-01T00:00:00Z"^^xsd:dateTime ;
+        dcterms:modified "2018-03-01T00:00:00Z"^^xsd:dateTime ;
+        dcat:keyword "test"@en, "keyword"@en ;
+        dcat:theme <https://data.gov.uk/theme/statistics> ;
+        dcat:contactPoint <mailto:ross.bowen@ons.gov.uk> ;
+        dcat:distribution <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018/datacube>, 
+            <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018.csv>, 
+            <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018.json> ;
+        dcterms:isReferencedBy <https://data.gov.uk/publication/name-of-my-publication> ;
+        dcat:landingPage <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018> ;
+        dcterms:accrualPeriodicity <http://purl.org/cld/freq/annual> ;
+        dcterms:spatial <http://statistics.data.gov.uk/id/statistical-geography/K02000001> ;
+        dcterms:temporal <http://reference.data.gov.uk/id/gregorian-interval/2008-01-01T00:00:00/P10Y> ;
+        dcat:inSeries <https://data.gov.uk/series/name-of-my-statistical-series> ;
+        # Example of quality measurement using dqv:
+        # https://www.w3.org/TR/vocab-dqv/#ExpressAQualityAssessmentWithQualityMetrics
+        dqv:hasQualityMeasurement 
+            [ a dqv:QualityMeasurement ;
+              dqv:computedOn <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018/datacube>;
+              dqv:isMeasurementOf dqv:completeness ;
+              dqv:value 0.98 ] ;
+        # Example of describing a dataset as four star linked data using dqv:
+        # https://www.w3.org/TR/vocab-dqv/#expressQualityClassification
+        dqv:hasQualityAnnotation 
+            [ a dqv:UserQualityFeedback ;
+              oa:hasTarget <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018> ;
+              oa:hasBody ex:four-stars ;
+              oa:motivatedBy dqv:qualityAssessment, oa:classifying ;
+              dqv:inDimension ex:linked-data-rating ] ;
+        dcat:hasCurrentVersion <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018/version/2> ;
+        dcat:hasVersion <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018/version/1>, 
+            <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018/version/2> ;
+        dcat:version 2 ;
+        adms:versionNotes "Dataset was corrected following an error being recognised."@en ;
+        dcat:prev <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2017> ;
+        .
+
+    # Versions
+
+    <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018/version/2> a dcat:Dataset ;
+        dcterms:identifier "dataset-2018-v2" ;
+        dcterms:issued "2018-03-01T00:00:00Z"^^xsd:dateTime ;
+        dcat:isVersionOf <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018> ;
+        dcat:previousVersion <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018/version/1>;
+        prov:wasRevisionOf <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018/version/1>;
+        prov:specializationOf <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018>;
+        .
+
+    <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018/version/1> a dcat:Dataset ;
+        dcterms:identifier "dataset-2018-v1" ;
+        dcterms:issued "2018-01-01T00:00:00Z"^^xsd:dateTime ;
+        dcat:isVersionOf <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018> ;
+        prov:specializationOf <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018>;
+        prov:invalidatedAtTime "2018-02-28T23:59:59Z"^^xsd:dateTime ;
+        .
+
+    # HTML distribution
+
+    <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018.html> a dcat:Distribution ;
+        dcat:mediaType <http://www.iana.org/assignments/media-types/text/html> ;
+        .
+
+    # RDF Data Cube distribution
+
+    <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018/datacube> a qb:DataSet, dcat:Distribution ;
+        qb:structure <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018/datacube/structure> ;
+        dcat:accessURL <https://data.gov.uk/sparql> ;
+        dcat:accessService <https://data.gov.uk> ;
+        # Example of QB integrity constraints described with dqv:
+        # https://www.w3.org/TR/vocab-dqv/#DocumentProvSingleQM
+        dqv:hasQualityMeasurement 
+            [ a dqv:QualityMeasurement ;
+              dqv:computedOn <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018/datacube> ;
+              dqv:isMeasurementOf <http://www.w3.org/TR/vocab-data-cube/#ic-19> ;
+              dqv:value "true"^^xsd:boolean ;
+              prov:wasAttributedTo <http://ci.data.gov.uk> ;
+              prov:generatedAtTime "2018-01-01T02:52:02Z"^^xsd:dateTime ;
+              prov:wasGeneratedBy <http://ci.data.gov.uk/job/1234> ] ;
+        .
+
+    # CSVW distribution
+
+    <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018.csv> a dcat:Distribution ;
+        wdrs:describedby <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018.csv-metadata.json> ;
+        dcat:mediaType <https://www.w3.org/ns/iana/media-types/text/csv#Resource> ;
+        dcat:downloadURL <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018.csv> ;
+        dcat:byteSize "12345"^^xsd:nonNegativeInteger ;
+        spdx:checksum "CE114E4501D2F4E2DCEA3E17B546F339"^^spdx:Checksum ;
+        .
+
+    <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018.csv-metadata.json> a <https://www.w3.org/ns/iana/media-types/application/csvm+json#Resource> .
+
+    # JSON
+
+    <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018.json> a dcat:Distribution ;
+        dcat:mediaType <http://www.iana.org/assignments/media-types/application/json> ;
+        dcat:downloadURL <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018.json> ;
+        dcat:byteSize "45678"^^xsd:nonNegativeInteger ;
+        spdx:checksum "4501D2F4G3HDF4G3HKEA32F4G3HDG745"^^spdx:Checksum ;
+        .
+    
+    # TTL
+    <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018.ttl> a dcat:Distribution ;
+        dcat:mediaType <http://www.iana.org/assignments/media-types/text/ttl> ;
+        dcat:downloadURL <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018.ttl> ;
+        dcat:byteSize "67890"^^xsd:nonNegativeInteger ;
+        spdx:checksum "XE456E4501D2F4G3HKEA3E17B546G774"^^spdx:Checksum ;
+        .
+
+}
+
+# The RDF datacube
+
+<https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018/datacube> {
+
+    <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018/datacube/structure> a qb:DataStructureDefinition ;
+        qb:component
+            <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018/datacube/structure/component/dimension1>,
+            <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018/datacube/structure/component/dimension2>,
+            <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018/datacube/structure/component/dimension3> ,
+            <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018/datacube/structure/component/measure1> ,
+            <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018/datacube/structure/component/attribute1> ;
+            .
+
+    <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018/datacube/structure/component/dimension1> a qb:ComponentSpecification;
+        qb:componentProperty ex:dimension1 ;
+        qb:dimension ex:dimension1 ;
+        qb:order 1 ;
+        .
+
+    <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018/datacube/structure/component/dimension2> a qb:ComponentSpecification;
+        qb:componentProperty ex:dimension2 ;
+        qb:dimension ex:dimension2 ;
+        qb:order 2 ;
+        .
+
+    <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018/datacube/structure/component/dimension3> a qb:ComponentSpecification;
+        qb:componentProperty ex:dimension3 ;
+        qb:dimension ex:dimension3 ;
+        qb:order 3 ;
+        .
+
+    <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018/datacube/structure/component/measure1> a qb:ComponentSpecification;
+        qb:componentProperty ex:measure1 ;
+        qb:measure ex:measure1 ;
+        qb:order 4 ;
+        .
+
+    <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018/datacube/structure/component/attribute1>  a qb:ComponentSpecification;
+        qb:componentProperty ex:attribute1 ;
+        qb:attribute ex:attribute1 ;
+        qb:order 5 ;
+        .
+
+    <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018/datacube/observation/value1-value2-value3> a qb:Observation ;
+        ex:dimension1 <https://data.gov.uk/codelist/dimension1/code/value1> ;
+        ex:dimension2 <https://data.gov.uk/codelist/dimension2/code/value2> ;
+        ex:dimension3 <https://data.gov.uk/codelist/dimension3/code/value3> ;
+        ex:measure1 100 ;
+        ex:attribute1 <https://data.gov.uk/codelist/statistical-markers/code/provisional> ;
+        .
+
+}
+
+# An RDF vocabulary describing the components used in the RDF datacube
+
+<https://data.gov.uk/series/name-of-my-statistical-series/vocabulary> {
+
+    ex:dimension1 a qb:DimensionProperty ;
+        rdfs:label "Dimension 1"@en ;
+        rdfs:comment "A dimension property"@en ;
+        rdfs:range rdfs:Resource ;
+        .
+
+    ex:dimension2 a qb:DimensionProperty ;
+        rdfs:label "Dimension 2"@en ;
+        rdfs:comment "A dimension property"@en ;
+        rdfs:range rdfs:Resource ;
+        .
+
+    ex:dimension3 a qb:DimensionProperty ;
+        rdfs:label "Dimension 3"@en ;
+        rdfs:comment "A dimension property"@en ;
+        rdfs:range rdfs:Resource ;
+        .
+
+    ex:measure1 a qb:MeasureProperty ;
+        rdfs:label "Measure 1"@en ;
+        rdfs:comment "A measure property"@en ;
+        rdfs:range xsd:decimal ;
+        .
+
+    ex:attribute1 a qb:AttributeProperty ;
+        rdfs:label "Attribute 1"@en ;
+        rdfs:comment "An attribute property"@en ;
+        rdfs:range skos:Concept ;
+        qb:codeList <https://data.gov.uk/codelist/statistical-markers> ;
+        .
+
+}
+
+# Example of a concept scheme used
+
+<https://data.gov.uk/codelist/statistical-markers/record> {
+
+    <https://data.gov.uk/codelist/statistical-markers> a skos:ConceptScheme ;
+        dcterms:title "Statistical markers codelist"@en ;
+        dcterms:description "A codelist of consistent shorthand to use in tables, spreadsheets and other related documentation, such as methodology reports, published by the public sector."@en ;
+        dcterms:license <https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/> ;
+        dcterms:publisher <https://www.ons.gov.uk/> ;
+        dcterms:issued "2022-01-11T00:00:00Z"^^xsd:dateTime ;
+        dcterms:modified "2022-01-11T00:00:00Z"^^xsd:dateTime ;
+        .
+
+}
+
+<https://data.gov.uk/codelist/statistical-markers> {
+
+    <https://data.gov.uk/codelist/statistical-markers/code/provisional> a skos:Concept ;
+        skos:prefLabel "Provisional"@en ;
+        skos:notation "[p]" ;
+        skos:inScheme <https://data.gov.uk/codelist/statistical-markers> ;
+        rdfs:isDefinedBy "https://gss.civilservice.gov.uk/policy-store/symbols-in-tables-definitions-and-help/"^^xsd:anyURI ;
+        .
+
+}
+
+# CSVW metadata
+
+<https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018.csv-metadata.json> {
+
+    <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018.csv> a csvw:Table ;
+        csvw:tableSchema [ csvw:column ( 
+            [ csvw:name "dimension1" ;
+              csvw:title "dimension1" ;
+              csvw:propertyUrl ex:dimension1 ;
+              csvw:valueUrl "https://data.gov.uk/codelist/dimension1/code/{dimension1}"^^csvw:uriTemplate ] 
+            [ csvw:name  "dimension2" ;
+              csvw:title "dimension2" ;
+              csvw:propertyUrl ex:dimension2 ;
+              csvw:valueUrl "https://data.gov.uk/codelist/dimension1/code/{dimension2}"^^csvw:uriTemplate ] 
+            [ csvw:name "dimension3" ;
+              csvw:title "dimension3" ;
+              csvw:propertyUrl ex:dimension3 ;
+              csvw:valueUrl "https://data.gov.uk/codelist/dimension1/code/{dimension3}"^^csvw:uriTemplate ] 
+            [ csvw:name "measure1" ;
+              csvw:title "measure1" ] 
+            [ csvw:name "attribute1" ;
+              csvw:title "attribute1" ] ) ] ;
+        csvw:url <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018.csv> ;
+        .
+
+}
+
+# Ideas:
+
+# Link Datasets and publications
+# https://www.w3.org/TR/vocab-dcat-3/#examples-dataset-publication
+
+<https://data.gov.uk/publication/name-of-my-publication> a <https://data.gov.uk/class/Publication> ;
+    <https://data.gov.uk/type> <https://data.gov.uk/class/OfficialStatistics> ;
+    # or gss:NationalStatistics, gss:ExperimentalStatistics, gss:AdhocStatistics, gss:Statistics etc.
+    prov:wasDerivedFrom <https://data.gov.uk/dataset/name-of-my-statistical-series/dataset/2018> ;
+    prov:wasGeneratedBy <http://ci.data.gov.uk/job/5678> ;
+    .
+
+# Have provenance information linking to the CI/CD jobs that generated the data
+
+<http://ci.data.gov.uk/job/5678> a prov:Activity;
+    prov:startedAtTime "2017-12-31T23:55:38Z"^^xsd:dateTime ;
+    prov:wasStartedBy <mailto:ross.bowen@ons.gov.uk> ;
+    prov:generated <https://data.gov.uk/publication/name-of-my-publication> ;
+    prov:endedAtTime "2018-01-01T00:00:00Z"^^xsd:dateTime ;
+    prov:wasEndedBy <mailto:ross.bowen@ons.gov.uk> ;
+    .
+
+# A user could dynamically query the dataset by crafting a query string
+# and would be returned a qb:ObservationGroup (or a qb:Slice).
+
+<https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018?dimension1=A&dimension2=B> a qb:Slice ;
+    qb:sliceStructure [ a qb:SliceKey ;
+                        qb:componentProperty ex:dimension1 ;
+                        qb:componentProperty ex:dimension2 ] ;
+    ex:dimension1 "A"@en ;
+    ex:dimension2 "B"@en ;
+    qb:observation <https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018/datacube/observation/A-B-C> ;
+    .
+
+
+<https://data.gov.uk/series/name-of-my-statistical-series/dataset/2018?measure1.ge=60> a qb:ObservationGroup .
